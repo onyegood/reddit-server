@@ -1,0 +1,28 @@
+# commit file
+.commit
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directory
+node_modules
+
+# Optional npm cache directory
+.npm
+
+# OS X
+.DS_STORE
+
+# JetBrains
+.idea
+
+# VS code
+.vscode
+
+# docker-compose environment file
+.env
+
+# generated scss type definitions
+*.scss.d.ts
