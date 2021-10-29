@@ -1,5 +1,5 @@
 import { User } from '../entities';
-import {Arg, Ctx, Resolver, Mutation, InputType, Field, ObjectType} from 'type-graphql';
+import {Arg, Ctx, Resolver, Mutation, InputType, Field, ObjectType, Query} from 'type-graphql';
 import { MyContext } from 'src/types';
 import argon2 from 'argon2';
 import { FieldError } from 'src/entities/Error';
@@ -23,6 +23,21 @@ class UserResponse {
 
 @Resolver()
 export class UserResolvers {
+
+    @Query(() => User)
+    async me(@Ctx() {req, em}: MyContext): Promise<User | null>{
+        const userId = req.session!.userId;
+        // You are not logged in
+        
+        if(!userId){
+            return null
+        }
+
+        const user = await em.findOne(User, {id: userId});
+
+        return user;
+    }
+
     @Mutation(() => UserResponse)
     async createUser(
         @Arg('options') options: UsernamePasswordInput,
@@ -68,7 +83,8 @@ export class UserResolvers {
     @Mutation(() => UserResponse)
     async login(
         @Arg('options') options: UsernamePasswordInput,
-        @Ctx() { em }: MyContext): Promise<UserResponse> {
+        @Ctx() { em, req }: MyContext): Promise<UserResponse> {
+        let sess: any =  req.session;
         const user = await em.findOne(User, { username: options.username });
 
         if (!user) {
@@ -91,6 +107,8 @@ export class UserResolvers {
             }
         }
         
+        sess!.userId = user.id;
+
         return { user };
     }
 }

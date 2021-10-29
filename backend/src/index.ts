@@ -1,15 +1,17 @@
 import "reflect-metadata";
+
+import { PostResolvers, UserResolvers } from "./resolvers";
+
+import { ApolloServer } from "apollo-server-express";
 import { MikroORM } from "@mikro-orm/core";
-import redis from "redis";
-import session from "express-session";
-import connnectRedis from "connect-redis";
+import { MyContext } from "./types";
 import { __prod__ } from "./constants";
+import { buildSchema } from "type-graphql";
+import connnectRedis from "connect-redis";
 import express from "express";
 import microConfig from "./mikro-orm.config";
-import { ApolloServer } from "apollo-server-express";
-
-import { buildSchema } from "type-graphql";
-import { PostResolvers, UserResolvers } from "./resolvers";
+import redis from "redis";
+import session from "express-session";
 
 const main = async () => {
     const orm = await MikroORM.init(microConfig);
@@ -33,10 +35,12 @@ const main = async () => {
             cookie: {
                 maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 Years
                 httpOnly: true,
+                sameSite: "lax", // csrf protection
                 secure: __prod__ // Cookie only works in https
             },
             secret: 'process.env.SESSION_SECRET_KEY',
             resave: false,
+            saveUninitialized: false
         })
     );
 
@@ -45,7 +49,7 @@ const main = async () => {
             resolvers: [PostResolvers, UserResolvers],
             validate: false,
         }),
-        context: () => ({ em: orm.em }),
+        context: ({ req, res }): MyContext => ({ em: orm.em, req, res }),
     });
 
     await apolloServer.start();
