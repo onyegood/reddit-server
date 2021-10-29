@@ -51,6 +51,6 @@ Add notes about how to use the system.
 
 
 ### Backend Dependecies
-yarn add @mikro-orm/cli @mikro-orm/core @mikro-orm/migrations @mikro-orm/postgresql pg
-yarn add express apollo-server-express graphql type-graphql
-yarn add @types/express -D
+  `yarn add @mikro-orm/cli @mikro-orm/core @mikro-orm/migrations @mikro-orm/postgresql pg`
+  `yarn add express apollo-server-express graphql type-graphql`
+  `yarn add @types/express -D`
