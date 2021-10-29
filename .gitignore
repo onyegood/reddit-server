@@ -6,6 +6,8 @@ logs
 *.log
 npm-debug.log*
 
+# Build directory
+dist
 # Dependency directory
 node_modules
 
@@ -26,3 +28,4 @@ node_modules
 
 # generated scss type definitions
 *.scss.d.ts
+yarn.lock
