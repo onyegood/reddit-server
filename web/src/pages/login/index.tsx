@@ -1,9 +1,11 @@
 import { Field, Form, Formik } from "formik";
+import { useRouter } from "next/dist/client/router";
 import React from "react";
 import { useMutation } from "urql";
+import { useLoginMutation } from "../../generated/graphql";
+import { toErrorMap } from "../../utils/toErrorMap";
 import AuthLayout from "../components/layouts/AuthLayout";
 import InputElement from "../components/ui-elements/input";
-import REGISTER_USER_MUTATION from "../mutations/register";
 
 interface Props {}
 
@@ -12,17 +14,23 @@ interface IInitialValues {
   password: string;
 }
 
-const RegisterPage: React.FC<Props> = () => {
-  const [{}, register] = useMutation(REGISTER_USER_MUTATION);
+const LoginPage: React.FC<Props> = () => {
+  const [{}, register] = useLoginMutation();
+  const router = useRouter();
 
   const initialValues: IInitialValues = { username: "", password: "" };
   return (
     <AuthLayout>
-      <h1>My Example</h1>
+      <h1>Login</h1>
       <Formik
         initialValues={initialValues}
-        onSubmit={(values, actions) => {
-          return register(values);
+        onSubmit={async (values, {setErrors}) => {
+          const {data} = await register(values);
+          if (data?.login.errors) {
+            setErrors(toErrorMap(data?.login.errors))
+          }else if(data?.login.user){
+            router.push('/')
+          }
         //   actions.setSubmitting(false);
         }}
       >
@@ -47,7 +55,7 @@ const RegisterPage: React.FC<Props> = () => {
               onChange={handleChange}
             />
 
-            <button type="submit">{isSubmitting ? "loading" : "Submit"}</button>
+            <button type="submit">{isSubmitting ? "loading" : "Login"}</button>
           </Form>
         )}
       </Formik>
@@ -55,4 +63,4 @@ const RegisterPage: React.FC<Props> = () => {
   );
 };
 
-export default RegisterPage;
+export default LoginPage;
