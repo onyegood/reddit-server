@@ -6,9 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "gen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
+    "@urql/exchange-graphcache": "^4.3.5",
     "add": "^2.0.6",
     "antd": "^4.16.13",
     "formik": "^2.2.9",
@@ -22,6 +24,10 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.2.2",
+    "@graphql-codegen/typescript": "2.3.0",
+    "@graphql-codegen/typescript-operations": "2.2.0",
+    "@graphql-codegen/typescript-urql": "^3.3.0",
     "@types/node": "16.11.6",
     "@types/react": "17.0.33",
     "eslint": "7.32.0",

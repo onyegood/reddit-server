@@ -5,13 +5,14 @@ import { PostResolvers, UserResolvers } from "./resolvers";
 import { ApolloServer } from "apollo-server-express";
 import { MikroORM } from "@mikro-orm/core";
 import { MyContext } from "./types";
-import { __prod__ } from "./constants";
+import { COOKIE_NAME, __prod__ } from "./constants";
 import { buildSchema } from "type-graphql";
 import connnectRedis from "connect-redis";
 import express from "express";
 import microConfig from "./mikro-orm.config";
 import redis from "redis";
 import session from "express-session";
+import cors from 'cors';
 
 const main = async () => {
     const orm = await MikroORM.init(microConfig);
@@ -25,9 +26,15 @@ const main = async () => {
     const RedisStore = connnectRedis(session);
     const redisClient = redis.createClient();
 
+    // Set cors origin 
+    app.use(cors({
+        origin: "http://localhost:3000",
+        credentials: true
+    }))
+
     app.use(
         session({
-            name: "qid",
+            name: COOKIE_NAME,
             store: new RedisStore({ 
                 client: redisClient,
                 disableTouch: true
@@ -53,11 +60,10 @@ const main = async () => {
     });
 
     await apolloServer.start();
+    
     apolloServer.applyMiddleware({ 
         app, 
-        cors: {
-            origin: "http://localhost:3000"
-        }
+        cors: false
     });
 
     app.listen(port, () => {
