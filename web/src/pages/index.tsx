@@ -1,12 +1,17 @@
-import type { NextPage } from 'next'
-import styles from '../styles/Home.module.css'
+import type { NextPage } from "next";
+import { withUrqlClient } from "next-urql";
+import { usePostsQuery } from "../generated/graphql";
+import AuthLayout from "./components/layouts/AuthLayout";
+import { createUrqlClient } from "./configurations/createUrqlClient";
 
 const Home: NextPage = () => {
+  const [{ data }] = usePostsQuery();
   return (
-    <div className={styles.container}>
+    <AuthLayout>
       <p>Hello bro</p>
-    </div>
-  )
-}
+      {!data ? null : data.posts.map((p) => <div key={p.id}>{p.title}</div>)}
+    </AuthLayout>
+  );
+};
 
-export default Home
+export default withUrqlClient(createUrqlClient, {ssr: true})(Home);
