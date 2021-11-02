@@ -14,6 +14,7 @@ import argon2 from "argon2";
 import { FieldError } from "../entities/FieldError";
 import { EntityManager } from "@mikro-orm/knex";
 import { COOKIE_NAME } from "../constants";
+import { sentEmail } from "src/utils/sendEmail";
 
 @InputType()
 class UsernamePasswordInput {
@@ -48,6 +49,21 @@ export class UserResolvers {
     const user = await em.findOne(User, { id: userId });
 
     return user;
+  }
+
+  @Mutation(() => Boolean)
+  async forgotPassword(@Arg("email") email: string, @Ctx() { em }: MyContext){
+    const user = await em.findOne(User, { email });
+    if (!user) {
+      // the email is not in the db
+      return true
+    }
+
+    const token = null;
+
+    await sentEmail([email], `<a href="http://localhost:3000/change-password/${token}">Reset password</a>`);
+
+    return true;
   }
 
   @Mutation(() => UserResponse)
