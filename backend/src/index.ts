@@ -5,12 +5,12 @@ import { PostResolvers, UserResolvers } from "./resolvers";
 import { ApolloServer } from "apollo-server-express";
 import { MikroORM } from "@mikro-orm/core";
 import { MyContext } from "./types";
-import { COOKIE_NAME, __prod__ } from "./constants";
+import { COOKIE_NAME, __PROD__ } from "./constants";
 import { buildSchema } from "type-graphql";
 import connnectRedis from "connect-redis";
 import express from "express";
 import microConfig from "./mikro-orm.config";
-import redis from "redis";
+import Redis from "ioredis";
 import session from "express-session";
 import cors from 'cors';
 // import { sentEmail } from "./utils/sendEmail";
@@ -26,7 +26,7 @@ const main = async () => {
     const port = process.env.PORT || 4000;
 
     const RedisStore = connnectRedis(session);
-    const redisClient = redis.createClient();
+    const redis = new Redis();
 
     // Set cors origin 
     app.use(cors({
@@ -38,14 +38,14 @@ const main = async () => {
         session({
             name: COOKIE_NAME,
             store: new RedisStore({ 
-                client: redisClient,
+                client: redis,
                 disableTouch: true
             }),
             cookie: {
                 maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 Years
                 httpOnly: true,
                 sameSite: "lax", // csrf protection
-                secure: __prod__ // Cookie only works in https
+                secure: __PROD__ // Cookie only works in https
             },
             secret: 'process.env.SESSION_SECRET_KEY',
             resave: false,
@@ -58,7 +58,7 @@ const main = async () => {
             resolvers: [PostResolvers, UserResolvers],
             validate: false,
         }),
-        context: ({ req, res }): MyContext => ({ em: orm.em, req, res }),
+        context: ({ req, res }): MyContext => ({ em: orm.em, req, res, redis }),
     });
 
     await apolloServer.start();

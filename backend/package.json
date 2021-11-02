@@ -28,6 +28,8 @@
     "@mikro-orm/core": "^4.5.9",
     "@mikro-orm/migrations": "^4.5.9",
     "@mikro-orm/postgresql": "^4.5.9",
+    "@types/ioredis": "^4.27.8",
+    "@types/uuid": "^8.3.1",
     "apollo-server-express": "^3.4.0",
     "argon2": "^0.28.2",
     "connect-redis": "^6.0.0",
@@ -38,7 +40,6 @@
     "ioredis": "^4.28.0",
     "nodemailer": "^6.7.0",
     "pg": "^8.7.1",
-    "redis": "^3.1.2",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^1.1.1",
     "uuid": "^8.3.2"
