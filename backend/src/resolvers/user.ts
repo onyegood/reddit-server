@@ -9,11 +9,13 @@ import {
   ObjectType,
   Query,
 } from "type-graphql";
+import { v4 } from "uuid";
 import { MyContext } from "../types";
 import argon2 from "argon2";
 import { FieldError } from "../entities/FieldError";
 import { EntityManager } from "@mikro-orm/knex";
-import { COOKIE_NAME } from "../constants";
+import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from "../constants";
+import { sentEmail } from "src/utils/sendEmail";
 
 @InputType()
 class UsernamePasswordInput {
@@ -48,6 +50,35 @@ export class UserResolvers {
     const user = await em.findOne(User, { id: userId });
 
     return user;
+  }
+
+  @Mutation(() => Boolean)
+  async forgotPassword(
+    @Arg("email") email: string,
+    @Ctx() { em, redis }: MyContext
+  ) {
+    const user = await em.findOne(User, { email });
+    if (!user) {
+      // the email is not in the db
+      return true;
+    }
+
+    const token = v4();
+
+    // Save token on redis
+    await redis.set(
+      FORGOT_PASSWORD_PREFIX + token,
+      user.id,
+      "ex",
+      1000 * 60 * 60 * 24 * 3
+    ); // Valid for 3 days
+
+    await sentEmail(
+      [email],
+      `<a href="http://localhost:3000/change-password/${token}">Reset password</a>`
+    );
+
+    return true;
   }
 
   @Mutation(() => UserResponse)
@@ -148,17 +179,17 @@ export class UserResolvers {
   }
 
   @Mutation(() => Boolean)
-  logout(
-    @Ctx() {req, res}: MyContext
-  ){
-    return new Promise(resolved => req.session.destroy(err => {
-      res.clearCookie(COOKIE_NAME);
-      if (err) {
-        console.log(err);
-        resolved(false)
-        return
-      }
-      resolved(true)
-    }))
+  logout(@Ctx() { req, res }: MyContext) {
+    return new Promise((resolved) =>
+      req.session.destroy((err) => {
+        res.clearCookie(COOKIE_NAME);
+        if (err) {
+          console.log(err);
+          resolved(false);
+          return;
+        }
+        resolved(true);
+      })
+    );
   }
 }

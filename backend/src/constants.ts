@@ -1,7 +1,9 @@
-const __prod__ = process.env.NODE_ENV !== 'production';
+const __PROD__ = process.env.NODE_ENV !== 'production';
 const COOKIE_NAME = 'qid';
+const FORGOT_PASSWORD_PREFIX = 'forgot-password:'
 
 export {
-    __prod__,
-    COOKIE_NAME
+    __PROD__,
+    COOKIE_NAME,
+    FORGOT_PASSWORD_PREFIX
 }
