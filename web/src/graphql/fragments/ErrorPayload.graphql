@@ -1,4 +1,0 @@
-fragment ErrorPayload on User {
-    field
-    message
-}
