@@ -1,7 +1,6 @@
-import { Field, Form, Formik } from "formik";
+import { Form, Formik } from "formik";
 import { useRouter } from "next/dist/client/router";
 import React from "react";
-import { useMutation } from "urql";
 import { useRegisterMutation } from "../../generated/graphql";
 import { toErrorMap } from "../../utils/toErrorMap";
 import AuthLayout from "../components/layouts/AuthLayout";
