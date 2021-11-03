@@ -50,7 +50,7 @@ const ChangePassword: NextPage<{token: string}> = ({ token }) => {
               onChange={handleChange}
             />
 
-            {tokenError && <div>{tokenError}</div>}
+            {tokenError ? <div>{tokenError}</div> : null}
 
             <button type="submit">{isSubmitting ? "loading" : "Change password"}</button>
           </Form>
