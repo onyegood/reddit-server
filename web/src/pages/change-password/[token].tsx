@@ -1,11 +1,13 @@
 import { NextPage } from 'next';
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Formik } from "formik";
 import { useRouter } from "next/dist/client/router";
 import { useChangePasswordMutation } from "../../generated/graphql";
 import { toErrorMap } from "../../utils/toErrorMap";
 import AuthLayout from "../components/layouts/AuthLayout";
 import InputElement from "../components/ui-elements/input";
+import { withUrqlClient } from 'next-urql';
+import { createUrqlClient } from '../configurations/createUrqlClient';
 
 interface IInitialValues {
     newPassword: string;
@@ -14,6 +16,8 @@ interface IInitialValues {
 const ChangePassword: NextPage<{token: string}> = ({ token }) => {
   const [{}, changePassword] = useChangePasswordMutation();
   const router = useRouter();
+
+  const [tokenError, setTokenError] = useState("");
 
   const initialValues: IInitialValues = { newPassword: "" };
   return (
@@ -24,7 +28,11 @@ const ChangePassword: NextPage<{token: string}> = ({ token }) => {
         onSubmit={async (values, {setErrors}) => {
           const {data} = await changePassword({newPassword: values.newPassword, token});
           if (data?.changePassword.errors) {
-            setErrors(toErrorMap(data?.changePassword.errors))
+            const errorMap = toErrorMap(data?.changePassword.errors);
+            if ('token' in errorMap) {
+              setTokenError(errorMap.token)
+            }
+            setErrors(errorMap)
           }else if(data?.changePassword.user){
             router.push('/')
           }
@@ -42,6 +50,8 @@ const ChangePassword: NextPage<{token: string}> = ({ token }) => {
               onChange={handleChange}
             />
 
+            {tokenError && <div>{tokenError}</div>}
+
             <button type="submit">{isSubmitting ? "loading" : "Change password"}</button>
           </Form>
         )}
@@ -57,4 +67,4 @@ ChangePassword.getInitialProps = ({ query }) => {
     }
 }
 
-export default ChangePassword;
+export default withUrqlClient(createUrqlClient, {ssr: false})(ChangePassword);

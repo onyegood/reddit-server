@@ -1,10 +1,12 @@
 import { Form, Formik } from "formik";
+import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/dist/client/router";
 import React from "react";
 import { useForgotPasswordMutation } from "../../generated/graphql";
 import { toErrorMap } from "../../utils/toErrorMap";
 import AuthLayout from "../components/layouts/AuthLayout";
 import InputElement from "../components/ui-elements/input";
+import { createUrqlClient } from "../configurations/createUrqlClient";
 
 interface Props {}
 
@@ -51,4 +53,4 @@ const ForgotPasswordPage: React.FC<Props> = () => {
   );
 };
 
-export default ForgotPasswordPage;
+export default withUrqlClient(createUrqlClient, {ssr: false})(ForgotPasswordPage);
