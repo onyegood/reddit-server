@@ -22,13 +22,12 @@ const ChangePassword: NextPage<{token: string}> = ({ token }) => {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values, {setErrors}) => {
-          const {data} = await changePassword(values);
+          const {data} = await changePassword({newPassword: values.newPassword, token});
           if (data?.changePassword.errors) {
             setErrors(toErrorMap(data?.changePassword.errors))
           }else if(data?.changePassword.user){
             router.push('/')
           }
-        //   actions.setSubmitting(false);
         }}
       >
         {({ values, handleChange, isSubmitting }) => (
