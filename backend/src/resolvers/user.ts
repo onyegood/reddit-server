@@ -52,6 +52,57 @@ export class UserResolvers {
     return user;
   }
 
+
+  @Mutation(() => UserResponse)
+  async changePassword(
+    @Arg("token") token: string,
+    @Arg("newPassword") newPassword: string,
+    @Ctx() { em, redis }: MyContext
+  ): Promise<UserResponse>{
+    if (newPassword.length <= 7) {
+      return {
+        errors: [
+          {
+            field: "newPassword",
+            message: "password must not be less than 8 characters length",
+          },
+        ],
+      };
+    }
+
+    const userId = await redis.get(FORGOT_PASSWORD_PREFIX+token);
+    if (!userId) {
+      return {
+        errors: [
+          {
+            field: "token",
+            message: "token expired",
+          },
+        ],
+      }
+    }
+
+    const user = await em.findOne(User, {id: parseInt(userId)});
+
+    if (!user) {
+      return {
+        errors: [
+          {
+            field: "token",
+            message: "User no longer exist",
+          },
+        ],
+      }
+    }
+
+    const hashedPassword = await argon2.hash(newPassword);
+    user.password = hashedPassword;
+    
+    await em.persistAndFlush(user);
+
+    return { user }
+  }
+
   @Mutation(() => Boolean)
   async forgotPassword(
     @Arg("email") email: string,
