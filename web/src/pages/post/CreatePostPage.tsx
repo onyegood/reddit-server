@@ -1,13 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/dist/client/router";
-import { usePostsMutation } from "../../generated/graphql";
 import { toErrorMap } from "../../utils/toErrorMap";
 import AuthLayout from "../components/layouts/AuthLayout";
 import InputElement from "../components/ui-elements/input";
 import { createUrqlClient } from "../configurations/createUrqlClient";
 import TextareaInputElement from "../components/ui-elements/textarea";
+import { useMeQuery, usePostsMutation } from '../../generated/graphql'
 
 interface Props {}
 
@@ -17,23 +17,27 @@ interface IInitialValues {
 }
 
 const CreatePostPage: React.FC<Props> = () => {
-  const [{}, post] = usePostsMutation();
+    const [{data, fetching}] = useMeQuery()
+  const [{}, createPost] = usePostsMutation();
   const router = useRouter();
-
   const initialValues: IInitialValues = { text: "", title: "" };
+
+  useEffect(() => {
+      if (!fetching && !data?.me) {
+        router.replace("/login")
+      }
+  }, [data, router, fetching]);
+
   return (
     <AuthLayout>
       <h1>New Post</h1>
       <Formik
         initialValues={initialValues}
         onSubmit={async (values, { setErrors }) => {
-          const { data } = await post(values);
-          if (data?.post.errors) {
-            setErrors(toErrorMap(data?.post.errors));
-          } else if (data?.post.user) {
+          const { errors } = await createPost({input: values});
+          if (!errors) {
             router.push("/");
           }
-          //   actions.setSubmitting(false);
         }}
       >
         {({ values, handleChange, isSubmitting }) => (
