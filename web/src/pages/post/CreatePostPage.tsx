@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/dist/client/router";
@@ -7,7 +7,8 @@ import AuthLayout from "../components/layouts/AuthLayout";
 import InputElement from "../components/ui-elements/input";
 import { createUrqlClient } from "../configurations/createUrqlClient";
 import TextareaInputElement from "../components/ui-elements/textarea";
-import { useMeQuery, usePostsMutation } from '../../generated/graphql'
+import { usePostsMutation } from '../../generated/graphql'
+import { useIsAuth } from "../../hooks/useIsAuth";
 
 interface Props {}
 
@@ -17,16 +18,11 @@ interface IInitialValues {
 }
 
 const CreatePostPage: React.FC<Props> = () => {
-    const [{data, fetching}] = useMeQuery()
   const [{}, createPost] = usePostsMutation();
   const router = useRouter();
   const initialValues: IInitialValues = { text: "", title: "" };
 
-  useEffect(() => {
-      if (!fetching && !data?.me) {
-        router.replace("/login")
-      }
-  }, [data, router, fetching]);
+  useIsAuth()
 
   return (
     <AuthLayout>
