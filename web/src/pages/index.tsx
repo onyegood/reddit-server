@@ -9,9 +9,13 @@ const Home: NextPage = () => {
   return (
     <AuthLayout>
       <p>Hello bro</p>
-      {!data ? null : data.posts.map((p) => <div key={p.id}>{p.title}</div>)}
+      {!data ? (
+        <div>loading...</div>
+      ) : (
+        data.posts.map((p) => <div key={p.id}>{p.title}</div>)
+      )}
     </AuthLayout>
   );
 };
 
-export default withUrqlClient(createUrqlClient, {ssr: true})(Home);
+export default withUrqlClient(createUrqlClient, { ssr: true })(Home);
