@@ -7,7 +7,7 @@ import { toErrorMap } from "../../../utils/toErrorMap";
 import AuthLayout from "../../components/layouts/AuthLayout";
 import InputElement from "../../components/ui-elements/input";
 import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../../configurations/createUrqlClient";
+import { createUrqlClient } from "../../../configurations/createUrqlClient";
 
 interface IInitialValues {
   newPassword: string;

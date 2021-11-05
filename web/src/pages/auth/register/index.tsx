@@ -6,7 +6,7 @@ import { useRegisterMutation } from "../../../generated/graphql";
 import { toErrorMap } from "../../../utils/toErrorMap";
 import AuthLayout from "../../components/layouts/AuthLayout";
 import InputElement from "../../components/ui-elements/input";
-import { createUrqlClient } from "../../configurations/createUrqlClient";
+import { createUrqlClient } from "../../../configurations/createUrqlClient";
 
 interface Props {}
 

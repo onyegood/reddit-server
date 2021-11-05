@@ -5,7 +5,7 @@ import { useRouter } from "next/dist/client/router";
 import { toErrorMap } from "../../utils/toErrorMap";
 import AuthLayout from "../components/layouts/AuthLayout";
 import InputElement from "../components/ui-elements/input";
-import { createUrqlClient } from "../configurations/createUrqlClient";
+import { createUrqlClient } from "../../configurations/createUrqlClient";
 import TextareaInputElement from "../components/ui-elements/textarea";
 import { usePostsMutation } from '../../generated/graphql'
 import { useIsAuth } from "../../hooks/useIsAuth";
