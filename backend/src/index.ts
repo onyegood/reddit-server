@@ -13,17 +13,22 @@ import session from "express-session";
 import cors from 'cors';
 import {createConnection} from 'typeorm';
 import { Post, User } from "./entities";
+import path from 'path';
+
 
 const main = async () => {
-    await createConnection({
+    const conn = await createConnection({
         type: 'postgres',
         database: 'litreddit2',
         username: 'postgres',
         password: 'postgres',
         logging: true,
         synchronize: true,
+        migrations: [path.join(__dirname, './migrations/*')],
         entities: [User, Post]
-    })
+    });
+
+    await conn.runMigrations();
 
 
   // Create Web Server

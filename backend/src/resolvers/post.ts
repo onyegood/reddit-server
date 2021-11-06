@@ -9,7 +9,11 @@ import {
   Field,
   Ctx,
   UseMiddleware,
+  FieldResolver,
+  Root,
+  ObjectType,
 } from "type-graphql";
+import { getConnection } from "typeorm";
 import { MyContext } from "src/types";
 import { isAuth } from "src/middlewares/isAuth";
 
@@ -21,11 +25,46 @@ class PostInput {
   text: string;
 }
 
-@Resolver()
+@ObjectType()
+class PaginatedPosts {
+  @Field(() => [Post])
+  posts: Post[];
+  @Field()
+  hasMore: boolean;
+}
+
+@Resolver(Post)
 export class PostResolvers {
-  @Query(() => [Post])
-  posts(): Promise<Post[]> {
-    return Post.find();
+  @FieldResolver(() => String)
+  textSnipet(@Root() root: Post) {
+    return root.text.slice(0, 50);
+  }
+
+  @Query(() => PaginatedPosts)
+  async posts(
+    @Arg("limit", () => Int) limit: number,
+    @Arg("cursor", () => String, { nullable: true }) cursor: string
+  ): Promise<PaginatedPosts> {
+    const realLimit = Math.min(50, limit);
+    const realLimitPlusOne = realLimit + 1;
+
+    const qb = getConnection()
+      .getRepository(Post)
+      .createQueryBuilder("p")
+      .innerJoinAndSelect("p.creator", "u", 'u.id = p."creatorId"')
+      .orderBy('p."createdAt"', "DESC")
+      .take(realLimitPlusOne);
+
+    if (cursor) {
+      qb.where('p."createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) });
+    }
+
+    const posts = await qb.getMany();
+
+    return {
+      posts: posts.slice(0, realLimit),
+      hasMore: posts.length === realLimitPlusOne,
+    };
   }
 
   @Query(() => Post, { nullable: true })
@@ -36,15 +75,15 @@ export class PostResolvers {
   @Mutation(() => Post)
   @UseMiddleware(isAuth)
   async createPost(
-      @Arg("input") input: PostInput,
-      @Ctx() { req }: MyContext
-      ): Promise<Post> {
+    @Arg("input") input: PostInput,
+    @Ctx() { req }: MyContext
+  ): Promise<Post> {
     const sess: any = req.session;
 
-    return Post.create({ 
-        ...input,
-        creatorId: sess.userId
-     }).save();
+    return Post.create({
+      ...input,
+      creatorId: sess.userId,
+    }).save();
   }
 
   @Mutation(() => Post, { nullable: true })
