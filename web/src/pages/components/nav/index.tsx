@@ -8,7 +8,7 @@ interface NavBarProps {}
 const NavBar: React.FC<NavBarProps> = ({}) => {
   const [{}, logout] = useLogoutMutation();
   const [{ data, fetching }] = useMeQuery({
-    pause: isServer()
+    pause: isServer(),
   });
 
   let body = null;
@@ -23,17 +23,13 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
     );
   } else {
     body = (
-        <>
-          <button onClick={() => logout()}>Logout</button>
-        </>
-      );
+      <>
+        <button onClick={() => logout()}>Logout</button>
+      </>
+    );
   }
 
-  return (
-    <div>
-        {body}
-    </div>
-  );
+  return <div>{body}</div>;
 };
 
 export default NavBar;

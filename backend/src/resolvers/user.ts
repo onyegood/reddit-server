@@ -8,6 +8,8 @@ import {
   Field,
   ObjectType,
   Query,
+  FieldResolver,
+  Root,
 } from "type-graphql";
 import { v4 } from "uuid";
 import { MyContext } from "../types";
@@ -36,13 +38,21 @@ class UserResponse {
   user?: User;
 }
 
-@Resolver()
+@Resolver(User)
 export class UserResolvers {
+  @FieldResolver(() => String)
+  // This is the current user and its ok to show their own email
+  email(@Root() user: User, @Ctx() { req }: MyContext) {
+    if ((req.session as any).userId === user.id) {
+      return user.email;
+    }
+    // Current user wants to see comeone else email
+    return "";
+  }
+
   @Query(() => User)
   async me(@Ctx() { req }: MyContext): Promise<User | undefined> {
-    let sess: any = req.session;
-
-    const userId = sess!.userId;
+    const userId = (req.session as any).userId;
     // You are not logged in
 
     if (!userId) {
@@ -216,7 +226,6 @@ export class UserResolvers {
     @Arg("password") password: string,
     @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
-    let sess: any = req.session;
     const isEmail = usernameOrEmail.includes("@");
     const queryObject = isEmail
       ? { email: usernameOrEmail }
@@ -248,7 +257,7 @@ export class UserResolvers {
       };
     }
 
-    sess!.userId = user.id;
+    (req.session as any).userId = user.id;
 
     return { user };
   }
