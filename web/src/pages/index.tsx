@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import { withUrqlClient } from "next-urql";
-import { usePostsQuery } from "../generated/graphql";
+import { useMeQuery, usePostsQuery } from "../generated/graphql";
 import AuthLayout from "./components/layouts/AuthLayout";
 import { createUrqlClient } from "../configurations/createUrqlClient";
 import React, { useState } from "react";
@@ -12,8 +12,9 @@ const Home: NextPage = () => {
     limit: 10,
     cursor: null as null | string | undefined,
   });
+  const [{ data: me }] = useMeQuery();
   const [{ data, fetching }] = usePostsQuery({ variables });
-  const [{}, deletePost] = useDeletePostMutation({ variables });
+  const [{}, deletePost] = useDeletePostMutation();
 
   const handleLoadmore = () => {
     setVariables({
@@ -42,7 +43,21 @@ const Home: NextPage = () => {
                 </NextLink>
 
                 <p>{p.textSnipet}</p>
-                <span onClick={() => deletePost({ id: p.id })}>Delete</span>
+                <div>
+                  {me?.me.id === p.creatorId && (
+                    <div>
+                      <span onClick={() => deletePost({ id: p.id })}>
+                        Delete
+                      </span>
+                      <NextLink
+                        href="/post/edit/[id]"
+                        as={`/post/edit/${p.id}`}
+                      >
+                        <span>Edit</span>
+                      </NextLink>
+                    </div>
+                  )}
+                </div>
               </div>
             )
           )}
