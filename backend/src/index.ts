@@ -15,6 +15,8 @@ import { createConnection } from "typeorm";
 import { Post, User } from "./entities";
 import path from "path";
 import { Updoot } from "./entities/Updoot";
+import { createUserLoader } from "./utils/data-loader/createUserLoader";
+import { createUpdootLoader } from "./utils/data-loader/createUpdootLoader";
 
 const main = async () => {
   const conn = await createConnection({
@@ -69,7 +71,13 @@ const main = async () => {
       resolvers: [PostResolvers, UserResolvers],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ req, res, redis }),
+    context: ({ req, res }): MyContext => ({
+      req,
+      res,
+      redis,
+      userLoader: createUserLoader(),
+      updootLoader: createUpdootLoader(),
+    }),
   });
 
   await apolloServer.start();

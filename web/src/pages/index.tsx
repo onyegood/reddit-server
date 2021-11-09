@@ -6,6 +6,7 @@ import { createUrqlClient } from "../configurations/createUrqlClient";
 import React, { useState } from "react";
 import UpdootSection from "./post/UpdootSection";
 import NextLink from "next/link";
+import EditDeletePostButtons from "./post/EditDeletePostButtons";
 
 const Home: NextPage = () => {
   const [variables, setVariables] = useState({
@@ -14,7 +15,6 @@ const Home: NextPage = () => {
   });
   const [{ data: me }] = useMeQuery();
   const [{ data, fetching }] = usePostsQuery({ variables });
-  const [{}, deletePost] = useDeletePostMutation();
 
   const handleLoadmore = () => {
     setVariables({
@@ -44,19 +44,7 @@ const Home: NextPage = () => {
 
                 <p>{p.textSnipet}</p>
                 <div>
-                  {me?.me.id === p.creatorId && (
-                    <div>
-                      <span onClick={() => deletePost({ id: p.id })}>
-                        Delete
-                      </span>
-                      <NextLink
-                        href="/post/edit/[id]"
-                        as={`/post/edit/${p.id}`}
-                      >
-                        <span>Edit</span>
-                      </NextLink>
-                    </div>
-                  )}
+                  <EditDeletePostButtons id={p.id} creatorId={p.creator.id} />
                 </div>
               </div>
             )

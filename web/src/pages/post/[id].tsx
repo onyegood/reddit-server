@@ -1,9 +1,9 @@
 import { Layout } from "antd";
 import { withUrqlClient } from "next-urql";
-import { useRouter } from "next/router";
 import React from "react";
 import { createUrqlClient } from "../../configurations/createUrqlClient";
 import useGetPostFromUrl from "../../hooks/useGetPostFromUrl";
+import EditDeletePostButtons from "./EditDeletePostButtons";
 
 const SinglePost = () => {
   const [{ data, fetching, error }] = useGetPostFromUrl();
@@ -36,6 +36,10 @@ const SinglePost = () => {
     <Layout>
       <h1>{data?.post?.title}</h1>
       <p>{data?.post?.text}</p>
+      <EditDeletePostButtons
+        id={data?.post.id}
+        creatorId={data?.post.creator.id}
+      />
     </Layout>
   );
 };
