@@ -207,20 +207,20 @@ export class PostResolvers {
   @UseMiddleware(isAuth)
   async updatePost(
     @Arg("id", () => Int) id: number,
-    @Arg("title", () => String) title: string
-  ): Promise<Post | undefined> {
-    const post = await Post.findOne(id);
+    @Arg("title", () => String) title: string,
+    @Arg("text", () => String) text: string,
+    @Ctx() { req }: MyContext
+  ): Promise<Post | null> {
+    const { userId } = req.session as any;
+    const result = await getConnection()
+      .createQueryBuilder()
+      .update(Post)
+      .set({ title, text })
+      .where('id = :id and "creatorId" = :creatorId', { id, creatorId: userId })
+      .returning("*")
+      .execute();
 
-    if (!post) {
-      return undefined;
-    }
-
-    if (typeof title !== "undefined") {
-      post.title = title;
-      await Post.update({ id }, { title });
-    }
-
-    return post;
+    return result.raw[0];
   }
 
   @Mutation(() => Boolean)
@@ -230,7 +230,24 @@ export class PostResolvers {
     @Ctx() { req }: MyContext
   ): Promise<boolean> {
     const { userId } = req.session as any;
+
+    // Option 1
+    // const post = await Post.findOne(id);
+    // if (!post) {
+    //   return false;
+    // }
+
+    // if (post.creatorId !== userId) {
+    //   throw new Error("not authorized");
+    // }
+
+    // await Updoot.delete({ postId: id });
+
+    // await Post.delete({ id });
+
+    // Option 2 = CASCADE
     await Post.delete({ id, creatorId: userId });
+
     return true;
   }
 }
