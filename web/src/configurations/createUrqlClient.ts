@@ -129,6 +129,12 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
                 );
               }
             },
+            deletePost: (_result, args, cache, info) => {
+              cache.invalidate({
+                __typename: "Post",
+                id: (args as DeletePostMutationVariables).id,
+              });
+            },
             createPost: (_result, args, cache, info) => {
               const allFields = cache.inspectFields("Query");
               const fieldInfos = allFields.filter(

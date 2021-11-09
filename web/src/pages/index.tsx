@@ -13,6 +13,7 @@ const Home: NextPage = () => {
     cursor: null as null | string | undefined,
   });
   const [{ data, fetching }] = usePostsQuery({ variables });
+  const [{}, deletePost] = useDeletePostMutation({ variables });
 
   const handleLoadmore = () => {
     setVariables({
@@ -32,16 +33,19 @@ const Home: NextPage = () => {
         <div>loading...</div>
       ) : (
         <div>
-          {data!.posts.posts.map((p) => (
-            <div key={p.id}>
-              <UpdootSection post={p} />
-              <NextLink href="/post/[id]" as={`/post/${p.id}`}>
-                <p>{p.title}</p>
-              </NextLink>
+          {data!.posts?.posts.map((p) =>
+            !p ? null : (
+              <div key={p.id}>
+                <UpdootSection post={p} />
+                <NextLink href="/post/[id]" as={`/post/${p.id}`}>
+                  <p>{p.title}</p>
+                </NextLink>
 
-              <p>{p.textSnipet}</p>
-            </div>
-          ))}
+                <p>{p.textSnipet}</p>
+                <span onClick={() => deletePost({ id: p.id })}>Delete</span>
+              </div>
+            )
+          )}
 
           {data && data.posts.hasMore ? (
             <button disabled={fetching} onClick={() => handleLoadmore()}>
