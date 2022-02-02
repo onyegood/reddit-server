@@ -17,14 +17,15 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
   } else if (!data?.me) {
     body = (
       <>
-        <NextLink href="/register">Register</NextLink>
-        <NextLink href="/login">Login</NextLink>
+        <NextLink href="/auth/register">Register</NextLink>
+        <NextLink href="/auth/login">Login</NextLink>
       </>
     );
   } else {
     body = (
       <>
         <button onClick={() => logout()}>Logout</button>
+        <NextLink href="/post">Create Post</NextLink>
       </>
     );
   }

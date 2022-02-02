@@ -7,7 +7,7 @@ import AuthLayout from "../components/layouts/AuthLayout";
 import InputElement from "../components/ui-elements/input";
 import { createUrqlClient } from "../../configurations/createUrqlClient";
 import TextareaInputElement from "../components/ui-elements/textarea";
-import { usePostsMutation } from '../../generated/graphql'
+import { useCreatePostMutation } from '../../generated/graphql'
 import { useIsAuth } from "../../hooks/useIsAuth";
 
 interface Props {}
@@ -18,7 +18,7 @@ interface IInitialValues {
 }
 
 const CreatePostPage: React.FC<Props> = () => {
-  const [{}, createPost] = usePostsMutation();
+  const [{}, createPost] = useCreatePostMutation();
   const router = useRouter();
   const initialValues: IInitialValues = { text: "", title: "" };
 
@@ -30,10 +30,9 @@ const CreatePostPage: React.FC<Props> = () => {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values, { setErrors }) => {
-          const { errors } = await createPost({input: values});
-          if (!errors) {
-            router.push("/");
-          }
+          console.log(values);
+          const { data } = await createPost({...values});
+          router.back();
         }}
       >
         {({ values, handleChange, isSubmitting }) => (

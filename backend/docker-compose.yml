@@ -1,0 +1,45 @@
+version: "3.7"
+services:
+  # backend-service:
+  #   container_name: backend-service
+  #   build:
+  #     dockerfile: Dockerfile
+  #     context: .
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     DATABASE_URL: postgresql://postgres:postgres@postgres:5432/lireddits
+  #     NODE_ENV: development
+  #     PORT: 4000
+  #   ports:
+  #     - "4000:4000"
+  postgres:
+    container_name: postgres
+    image: postgres:10.5
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./src/migrations/dbinit.sql:/docker-entrypoint-initdb.d/dbinit.sql
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lireddits
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:4.18
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@linuxhint.com
+      PGADMIN_DEFAULT_PASSWORD: secret
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "5001:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+volumes:
+    db-data:
+    pgadmin-data:

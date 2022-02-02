@@ -25,7 +25,9 @@ node_modules
 
 # docker-compose environment file
 .env
+.env.production
 
 # generated scss type definitions
 *.scss.d.ts
 yarn.lock
+postgres-data

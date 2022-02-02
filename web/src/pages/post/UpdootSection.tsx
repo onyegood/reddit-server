@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PostsQuery } from "../../generated/graphql";
+import { PostSnippetFragment, useVoteMutation } from "../../generated/graphql";
 
 interface UpdootSection {
   post: PostSnippetFragment;

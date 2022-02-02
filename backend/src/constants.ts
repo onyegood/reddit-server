@@ -1,4 +1,4 @@
-const __PROD__ = process.env.NODE_ENV !== 'production';
+const __PROD__ = process.env.NODE_ENV === 'production';
 const COOKIE_NAME = 'qid';
 const FORGOT_PASSWORD_PREFIX = 'forgot-password:'
 

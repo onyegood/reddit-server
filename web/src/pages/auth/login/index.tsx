@@ -1,17 +1,17 @@
-import { Form, Formik } from "formik";
-import { withUrqlClient } from "next-urql";
-import { useRouter } from "next/dist/client/router";
-import React from "react";
-import { useLoginMutation } from "../../../generated/graphql";
-import { toErrorMap } from "../../../utils/toErrorMap";
-import AuthLayout from "../../components/layouts/AuthLayout";
-import InputElement from "../../components/ui-elements/input";
-import { createUrqlClient } from "../../../configurations/createUrqlClient";
+import { Form, Formik } from 'formik';
+import { withUrqlClient } from 'next-urql';
+import { useRouter } from 'next/dist/client/router';
+import React from 'react';
+import { useLoginMutation } from '../../../generated/graphql';
+import { toErrorMap } from '../../../utils/toErrorMap';
+import AuthLayout from '../../components/layouts/AuthLayout';
+import InputElement from '../../components/ui-elements/input';
+import { createUrqlClient } from '../../../configurations/createUrqlClient';
 
 interface Props {}
 
 interface IInitialValues {
-  username: string;
+  usernameOrEmail: string;
   password: string;
 }
 
@@ -19,48 +19,48 @@ const LoginPage: React.FC<Props> = () => {
   const [{}, register] = useLoginMutation();
   const router = useRouter();
 
-  const initialValues: IInitialValues = { username: "", password: "" };
+  const initialValues: IInitialValues = { usernameOrEmail: '', password: '' };
   return (
     <AuthLayout>
       <h1>Login</h1>
       <Formik
         initialValues={initialValues}
-        onSubmit={async (values, {setErrors}) => {
-          const {data} = await register(values);
+        onSubmit={async (values, { setErrors }) => {
+          const { data } = await register(values);
           if (data?.login.errors) {
-            setErrors(toErrorMap(data?.login.errors))
-          }else if(data?.login.user){
-            if(typeof router.query.next === "string"){
-              router.push(router.query.next)
-            }else{
-              router.push('/')
+            setErrors(toErrorMap(data?.login.errors));
+          } else if (data?.login.user) {
+            if (typeof router.query.next === 'string') {
+              router.push(router.query.next);
+            } else {
+              router.push('/');
             }
           }
-        //   actions.setSubmitting(false);
+          //   actions.setSubmitting(false);
         }}
       >
         {({ values, handleChange, isSubmitting }) => (
           <Form>
             <InputElement
-              label="Username"
-              id="username"
-              name="username"
-              placeholder="Username"
-              value={values.username}
+              label='Username'
+              id='usernameOrEmail'
+              name='usernameOrEmail'
+              placeholder='Username'
+              value={values.usernameOrEmail}
               onChange={handleChange}
             />
 
             <InputElement
-              label="Password"
-              id="password"
-              name="password"
-              placeholder="Password"
+              label='Password'
+              id='password'
+              name='password'
+              placeholder='Password'
               value={values.password}
-              type="password"
+              type='password'
               onChange={handleChange}
             />
 
-            <button type="submit">{isSubmitting ? "loading" : "Login"}</button>
+            <button type='submit'>{isSubmitting ? 'loading' : 'Login'}</button>
           </Form>
         )}
       </Formik>
@@ -68,4 +68,4 @@ const LoginPage: React.FC<Props> = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient, {ssr: false})(LoginPage);
+export default withUrqlClient(createUrqlClient, { ssr: true })(LoginPage);

@@ -1,5 +1,5 @@
 import Dataloader from "dataloader";
-import { User } from "src/entities";
+import { User } from "../../entities";
 
 export const createUserLoader = () =>
   new Dataloader<number, User>(async (userIds) => {

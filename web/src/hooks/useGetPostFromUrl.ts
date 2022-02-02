@@ -1,5 +1,5 @@
 import React from "react";
-import { usePostQuery } from "../../generated/graphql";
+import { usePostQuery } from "../generated/graphql";
 import useGetIntIdFromUrl from "./useGetIntIdFromUrl";
 
 const useGetPostFromUrl = () => {

@@ -1,12 +1,12 @@
-import type { NextPage } from "next";
-import { withUrqlClient } from "next-urql";
-import { useMeQuery, usePostsQuery } from "../generated/graphql";
-import AuthLayout from "./components/layouts/AuthLayout";
-import { createUrqlClient } from "../configurations/createUrqlClient";
-import React, { useState } from "react";
-import UpdootSection from "./post/UpdootSection";
-import NextLink from "next/link";
-import EditDeletePostButtons from "./post/EditDeletePostButtons";
+import type { NextPage } from 'next';
+import { withUrqlClient } from 'next-urql';
+import { useMeQuery, usePostsQuery } from '../generated/graphql';
+import AuthLayout from './components/layouts/AuthLayout';
+import { createUrqlClient } from '../configurations/createUrqlClient';
+import React, { useState } from 'react';
+import UpdootSection from './post/UpdootSection';
+import NextLink from 'next/link';
+import EditDeletePostButtons from './post/EditDeletePostButtons';
 
 const Home: NextPage = () => {
   const [variables, setVariables] = useState({
@@ -29,16 +29,19 @@ const Home: NextPage = () => {
 
   return (
     <AuthLayout>
-      <p>Hello bro</p>
       {!data && fetching ? (
         <div>loading...</div>
+      ) : data!.posts?.posts.length === 0 ? (
+        <div>
+          <p>No data</p>
+        </div>
       ) : (
         <div>
           {data!.posts?.posts.map((p) =>
             !p ? null : (
               <div key={p.id}>
                 <UpdootSection post={p} />
-                <NextLink href="/post/[id]" as={`/post/${p.id}`}>
+                <NextLink href='/post/[id]' as={`/post/${p.id}`}>
                   <p>{p.title}</p>
                 </NextLink>
 

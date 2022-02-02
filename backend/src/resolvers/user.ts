@@ -201,7 +201,6 @@ export class UserResolvers {
       //   email: options.email,
       //   password: hashedPassword,
       // }).save()
-
       user = result.raw[0];
     } catch (error) {
       // console.log(error)
@@ -256,6 +255,8 @@ export class UserResolvers {
         ],
       };
     }
+
+
 
     (req.session as any).userId = user.id;
 

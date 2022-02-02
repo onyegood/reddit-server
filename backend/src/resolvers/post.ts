@@ -14,10 +14,10 @@ import {
   ObjectType,
 } from "type-graphql";
 import { getConnection } from "typeorm";
-import { MyContext } from "src/types";
-import { isAuth } from "src/middlewares/isAuth";
-import { Updoot } from "src/entities/Updoot";
-import { User } from "src/entities";
+import { MyContext } from "../types";
+import { isAuth } from "../middlewares/isAuth";
+import { Updoot } from "../entities/Updoot";
+import { User } from "../entities";
 
 @InputType()
 class PostInput {
